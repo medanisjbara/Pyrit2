@@ -18,7 +18,7 @@
 
 
 from struct import pack,unpack,calcsize
-from md5 import md5
+from hashlib import md5
 import os
 import fcntl
 from time import time
@@ -50,12 +50,12 @@ class ESSID(object):
 
     def refresh(self):
         if self.f is None:
-            raise Exception, "ESSID not locked."
+            raise Exception ("ESSID not locked.")
         return frozenset([x[:len(x)-4] for x in os.listdir(self.path) if x[-4:] == '.pyr'])
 
     def open_result(self, key):
         if self.f is None:
-            raise Exception, "ESSID not locked."
+            raise Exception ("ESSID not locked.")
         return PyrFile(self.essid, os.path.join(self.path, key+".pyr"))
  
     results = property(fget=refresh)
@@ -68,7 +68,7 @@ class EssidStore(object):
     def makedir(self,pathname):
         try:
             os.makedirs(pathname)
-        except OSError, (errno, sterrno):
+        except OSError (errno, sterrno):
             if errno == 17:
                 pass
             else:
@@ -87,12 +87,12 @@ class EssidStore(object):
                 essids.add(essid)
             else:
                 #pass
-                print "ESSID %s seems to be corrupted." % essid_hash
+                print ("ESSID %s seems to be corrupted." % essid_hash)
         return frozenset(essids)
 
     def create_essid(self,essid):
         if len(essid) < 3 or len(essid) > 32:
-            raise Exception, "ESSID invalid."
+            raise Exception ("ESSID invalid.")
         essid_root = self._getessidroot(essid)
         self.makedir(essid_root)
         f = open(os.path.join(essid_root,'essid'),"wb")
@@ -130,18 +130,18 @@ class PasswordFile(object):
                 if self.pw_h1 is None:
                     self.pw_h1 = PasswordFile._pwdigest(inp[0])
                 if digest == md.digest():
-                    if len([x for x in sample(inp, min(5,len(inp))) if PasswordFile._pwdigest(x) != self.pw_h1]) <> 0:
-                        raise Exception, "At least some passwords in file '%s' don't belong into this instance of type %s." % (filename, self.pw_h1)
+                    if len([x for x in sample(inp, min(5,len(inp))) if PasswordFile._pwdigest(x) != self.pw_h1]) != 0:
+                        raise Exception ("At least some passwords in file '%s' don't belong into this instance of type %s." % (filename, self.pw_h1))
                     if filename[-3-len(md.hexdigest()):-3] != md.hexdigest():
-                        raise Exception, "File '%s' doesn't match the key '%s'." % (filename,md.hexdigest())
+                        raise Exception ("File '%s' doesn't match the key '%s'." % (filename,md.hexdigest()))
                     self.bucket = frozenset(inp)
                 else:
-                    print "Digest check failed for %s" % filename
+                    print ("Digest check failed for %s" % filename)
                     fcntl.flock(f.fileno(), fcntl.LOCK_UN)
                     f.close()
                     self.f = None
         except:
-            print "Exception while opening PasswordFile '%s', file not loaded." % filename
+            print ("Exception while opening PasswordFile '%s', file not loaded." % filename)
             fcntl.flock(f.fileno(), fcntl.LOCK_UN)
             f.close()
             self.f = None
@@ -168,7 +168,7 @@ class PasswordFile(object):
 
     def savefile(self):
         if self.f is None:
-            raise Exception, "No file opened."
+            raise Exception ("No file opened.")
         fcntl.flock(self.f.fileno(), fcntl.LOCK_EX)
         md = md5()
         b = list(self.bucket)
@@ -190,7 +190,7 @@ class PasswordStore(object):
     def makedir(self,pathname):
         try:
             os.makedirs(pathname)
-        except OSError, (errno, sterrno):
+        except OSError(errno, sterrno):
             if errno == 17:
                 pass
 
@@ -241,12 +241,12 @@ class PasswordStore(object):
         pwstrip = str(passwd).lower().strip()
         pwgroups = self.pwpattern.search(pwstrip)
         if pwgroups is None:
-            #print "Password '%s'('%s') ignored." % (pwstrip,passwd)
+            #print ("Password '%s'('%s') ignored." % (pwstrip,passwd))
             return
         pwstrip = pwgroups.groups()[0]
 
         if len(pwstrip) < 8 or len(pwstrip) > 63:
-            #print "Password '%s'('%s') has invalid length." % (pwstrip,passwd)
+            #print ("Password '%s'('%s') has invalid length." % (pwstrip,passwd))
             return
 
         pw_h1 = PasswordFile._pwdigest(pwstrip)

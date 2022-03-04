@@ -55,7 +55,7 @@ class Pyrit(object):
     def eval_results(self, essid=None):
         if essid is not None:
             if essid not in self.essidstore.essids:
-                raise Exception, "ESSID parameter not in store."
+                raise Exception("ESSID parameter not in store.")
             essid = [essid]
         else:
             essid = self.essidstore.essids

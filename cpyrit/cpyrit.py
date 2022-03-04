@@ -82,7 +82,7 @@ class CPUCore(object):
         elif isinstance(password, str):
             return _cpyrit.calc_pmk(essid, password)
         else:
-            raise TypeError, "Password parameter must be string or list"
+            raise TypeError ("Password parameter must be string or list")
     
 
 class CPyrit(object):

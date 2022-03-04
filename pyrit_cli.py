@@ -45,17 +45,17 @@ class Pyrit_CLI(object):
             elif option == '-f':
                 self.options["file"] = value
             else:
-                print "Option '%s' not known. Ignoring..." % option
+                print ("Option '%s' not known. Ignoring..." % option)
                 
         self.pyrit_obj = Pyrit(self.options["essidstore_path"], self.options["passwdstore_path"])        
         
         command = commands[0]
         if command == "export_cowpatty":
             if self.options["file"] is None:
-                print "One must specify a filename using the -f option. See --help"
+                print ("One must specify a filename using the -f option. See --help")
             else:
                 if self.options["essid"] is None:
-                    print "The cowpatty-format only supports one ESSID per file. Please specify one using the -e option."
+                    print ("The cowpatty-format only supports one ESSID per file. Please specify one using the -e option.")
                 else:
                     self.export_cowpatty()
         
@@ -64,7 +64,7 @@ class Pyrit_CLI(object):
         
         elif command == "import_password":
             if self.options["file"] is None:
-                print "One must specify a filename using the -f options. See --help"
+                print ("One must specify a filename using the -f options. See --help")
             else:
                 if self.options["file"] == "-":
                     f = sys.stdin
@@ -76,22 +76,22 @@ class Pyrit_CLI(object):
         
         elif command == "export_passwords":
             if self.options["file"] is None:
-                print "One must specify a filename using the -f option. See --help"
+                print ("One must specify a filename using the -f option. See --help")
             else:
                 self.export_passwords()
 
         elif command == "list_essids":
             for e in pyrit_obj.list_essids():
-                print e
+                print (e)
         
         elif command == "eval_results":
             for e in self.pyrit_obj.eval_results(self.options["essid"]):
-                print "ESSID:\t '%s'" % e[1]
-                print "Passwords available:\t %i" % e[2]
-                print "Passwords done so far:\t %i (%.2f%%)" % (e[3], e[3] / e[2])
-                print "" 
+                print ("ESSID:\t '%s'" % e[1])
+                print ("Passwords available:\t %i" % e[2])
+                print ("Passwords done so far:\t %i (%.2f%%)" % (e[3], e[3] / e[2]))
+                print ("" )
         else:
-            print "Don't know that command. See valid commands with --help"
+            print ("Don't know that command. See valid commands with --help")
         
     def export_passwords(self):
         if self.options["file"] == "-":
@@ -102,19 +102,19 @@ class Pyrit_CLI(object):
             sys.stdout.flush()
         else:
             f = open(self.options["file"],"w")
-            print "Exporting to '%s'..." % self.options["file"]
+            print ("Exporting to '%s'..." % self.options["file"])
             max_idx = 0
             lines = 0
             for idx, rowset in self.pyrit_obj.export_passwords():
                 max_idx = max(idx, max_idx)
-                print "[" + '#' * int((max_idx - idx) * 20.0 / max_idx) + "-" * (20 - int((max_idx - idx) * 20.0 / max_idx)) + "]",
-                print "%i lines written (%.2f%%)\r" % (lines, (max_idx - idx) * 100.0 / max_idx),
+                print ("[" + '#' * int((max_idx - idx) * 20.0 / max_idx) + "-" * (20 - int((max_idx - idx) * 20.0 / max_idx)) + "]",)
+                print ("%i lines written (%.2f%%)\r" % (lines, (max_idx - idx) * 100.0 / max_idx),)
                 for row in rowset:
                     f.write(row+"\n")
                 lines += len(rowset)
                 sys.stdout.flush()
             f.close()
-            print "\nAll done"
+            print ("\nAll done")
         
     def export_cowpatty(self):
         if self.options["file"] == "-":
@@ -123,7 +123,7 @@ class Pyrit_CLI(object):
             sys.stdout.flush()
         else:
             f = open(self.options["file"],"w")
-            print "Exporting to '%s'..." % self.options["file"]
+            print ("Exporting to '%s'..." % self.options["file"])
             max_idx = 0
             lines = 0
             for idx, row in self.pyrit_obj.export_cowpatty(self.options["essid"]): 
@@ -131,11 +131,11 @@ class Pyrit_CLI(object):
                 f.write(row)
                 lines += 1
                 if lines % 1000 == 0:
-                    print "[" + '#' * int((max_idx - idx) * 20.0 / max_idx) + "-" * (20 - int((max_idx - idx) * 20.0 / max_idx)) + "]",
-                    print "%i lines written (%.2f%%)\r" % (lines, (max_idx - idx) * 100.0 / max_idx),
+                    print ("[" + '#' * int((max_idx - idx) * 20.0 / max_idx) + "-" * (20 - int((max_idx - idx) * 20.0 / max_idx)) + "]",)
+                    print ("%i lines written (%.2f%%)\r" % (lines, (max_idx - idx) * 100.0 / max_idx),)
                     sys.stdout.flush()
             f.close()
-            print "\nAll done."
+            print ("\nAll done.")
         
 if __name__ == "__main__":
     p = Pyrit_CLI()

@@ -17,12 +17,12 @@
 
 
 from zlib import compress,decompress
-from md5 import md5
+from hashlib import md5
 import fcntl
 from struct import pack,unpack,calcsize
-import StringIO
+import io
 from random import choice
-from cpyrit import CPyrit
+from cpyrit.cpyrit import CPyrit
 
 class PyrFile(object):
     def __init__(self,essid,infile):
@@ -50,8 +50,8 @@ class PyrFile(object):
                 self.f = f
             else:
                 magic,essidlen = unpack(preheadfmt, prehead)
-                if magic <> "PYRT":
-                    raise Exception, "Oh no! It's not a pyrit binary file."
+                if magic != "PYRT":
+                    raise Exception ("Oh no! It's not a pyrit binary file.")
                 infile_digest = md5()
                 nextheadfmt = "<%ssi%ss" % (essidlen,infile_digest.digest_size)
                 essid, inplength, digest = unpack(nextheadfmt,f.read(calcsize(nextheadfmt)))
@@ -74,18 +74,18 @@ class PyrFile(object):
                     self.results = dict(results)
                     self.f = f
                 else:
-                    raise Exception, "Digest check failed."
+                    raise Exception ("Digest check failed.")
         except:
-            print "Exception while opening PyrFile '%s', file not loaded." % infile
+            print ("Exception while opening PyrFile '%s', file not loaded." % infile)
             fcntl.flock(f.fileno(), fcntl.LOCK_UN)
             f.close()
             raise
 
     def savefile(self):
         if self.f is None:
-            raise Exception, "No file opened."
+            raise Exception ("No file opened.")
         if self.essid is None or len(self.essid) == 0:
-            raise Exception, "ESSID not set."
+            raise Exception ("ESSID not set.")
         fcntl.flock(self.f.fileno(), fcntl.LOCK_EX)
         self.f.truncate(0)
         pwbuffer,pmkbuffer = zip(*self.results.iteritems())
