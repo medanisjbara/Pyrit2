@@ -23,7 +23,7 @@
 
 #define uchar  unsigned char
 
-#include <python2.5/Python.h>
+#include <Python.h>
 
 #ifndef GET_BE
 #define GET_BE(n,b,i)                            \
